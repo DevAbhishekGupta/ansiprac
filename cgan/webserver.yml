@@ -1,0 +1,33 @@
+---
+- name: This sets up an httpd webseerver
+  hosts: centos2
+  tasks:
+  - name: Install apache packages
+    package:
+      name: httpd
+      state: present
+    notify: Package Install
+
+  - name: ensure httpd is running
+    service:
+      name: httpd
+      state: started
+  - name: open port 80 for httpd access
+    firewalld:
+      service: http
+      permanent: yes
+      state: enabled
+  - name: restart firewald
+    service:
+      name: firewalld
+      state: restarted
+    notify: Firewall Restarted
+
+  handlers:
+    - name: Package Install
+      debug:
+        msg: Apache Package Install 
+
+    - name: Firewall Restarted
+      debug:
+        msg: Firewall is restarted
