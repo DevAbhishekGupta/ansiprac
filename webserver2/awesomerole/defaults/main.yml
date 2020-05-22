@@ -1,0 +1,4 @@
+---
+# defaults file for awesomerole
+
+target_dir: /usr/share/nginx/html

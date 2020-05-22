@@ -1,0 +1,54 @@
+---
+- name: This sets up an httpd webseerver
+  hosts: centos2
+  tasks:
+  - name: Install apache packages
+    package:
+      name: httpd
+      state: present
+    notify: Package Install
+
+  - name: ensure httpd is running
+    service:
+      name: httpd
+      state: started
+
+  - name: Template index.html.j2 to index.html on target
+    template:
+      src: templates/index.html.j2
+      dest: /var/www/html/index.html
+      mode: 0644
+
+  - name: restart apache
+    service:
+      name: httpd
+      state: restarted
+    notify: Check HTTP Service 
+
+  - name: open port 80 for httpd access
+    firewalld:
+      service: http
+      permanent: yes
+      state: enabled
+  - name: restart firewald
+    service:
+      name: firewalld
+      state: restarted
+    notify: Firewall Restarted
+
+  handlers:
+    - name: Package Install
+      debug:
+        msg: Apache Package Install 
+
+    - name: Firewall Restarted
+      debug:
+        msg: Firewall is restarted
+
+    - name: Check HTTP Service
+      uri:
+        url: http://{{ ansible_default_ipv4.address }}
+        status_code: 200
+
+
+
